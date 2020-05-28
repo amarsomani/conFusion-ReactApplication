@@ -4,7 +4,7 @@ import {
     Button, Row, Col, Label
 } from 'reactstrap'
 import { Link } from 'react-router-dom';
-import { Control, LocalForm, Errors } from 'react-redux-form';
+import { Control, LocalForm, Errors, Field } from 'react-redux-form';
 
 const required = (val) => val && val.length;
 const maxLength = (len) => (val) => !(val) || (val.length <= len);
@@ -28,8 +28,10 @@ class CommentForm extends Component {
 
     submitHandle = (values) => {
         this.handleToggle();
-        alert('Rating: ' + document.getElementById('rating').value + ' author: ' + document.getElementById('author').value +
-            ' comment: ' + document.getElementById('comment').value);
+        this.props.addComment(this.props.dishId, values.rating, values.author, values.comment);
+        console.log(values);
+        console.log(this.props.dishId);
+        console.log(document.getElementById('rating').value)
 
     }
     render() {
@@ -45,16 +47,16 @@ class CommentForm extends Component {
                             <Row className="form-group">
                                 <Label htmlFor="rating" md={4}>Rating</Label>
                                 <Col md={12}>
-                                    <Control.select model=".rating" id="rating" name="rating"
-                                        className="form-control"
-
-                                    >
-                                        <option>1</option>
-                                        <option>2</option>
-                                        <option>3</option>
-                                        <option>4</option>
-                                        <option>5</option>
-                                    </Control.select>
+                                    <Field model=".rating" >
+                                        <select id="rating" name="rating"
+                                            className="form-control">
+                                            <option>1</option>
+                                            <option>2</option>
+                                            <option>3</option>
+                                            <option>4</option>
+                                            <option>5</option>
+                                        </select>
+                                    </Field>
                                 </Col>
                             </Row>
                             <Row className="form-group">
@@ -108,7 +110,7 @@ class CommentForm extends Component {
                         </LocalForm>
                     </ModalBody>
                 </Modal>
-            </React.Fragment>
+            </React.Fragment >
         );
     }
 }
@@ -126,7 +128,7 @@ function RenderDish({ dish }) {
     )
 }
 
-function RenderComments({ comments }) {
+function RenderComments({ comments, addComment, dishId }) {
     if (comments.length === 0) return (<div></div>);
 
     const list = comments.map(item => {
@@ -148,7 +150,7 @@ function RenderComments({ comments }) {
             <ul className="list-unstyled">
                 {list}
             </ul>
-            <CommentForm />
+            <CommentForm dishId={dishId} addComment={addComment} />
         </div>
     )
 }
@@ -175,7 +177,10 @@ const DishDetail = (props) => {
                     <RenderDish dish={props.dish} />
                 </div>
                 <div className="col-12 col-md-5 m-1">
-                    <RenderComments comments={(props.comments)} />
+                    <RenderComments
+                        comments={(props.comments)}
+                        addComment={props.addComment}
+                        dishId={props.dish.id} />
                 </div>
             </div>
         </div>
